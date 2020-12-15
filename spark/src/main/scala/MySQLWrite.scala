@@ -11,7 +11,7 @@ object MySQLWrite {
   def main(args: Array[String]): Unit = {
     // 1. 创建 SparkSession 对象
     val spark = SparkSession.builder()
-      .master("local[6]")
+      .master("local[10]")
       .appName("mysql write")
       .getOrCreate()
 
@@ -20,25 +20,25 @@ object MySQLWrite {
 //        2. 读取
     val schema = StructType(
           List(
-              StructField("name", StringType),
-            StructField("age", IntegerType),
-            StructField("gpa", FloatType)
+              StructField("phone", StringType),
+            StructField("uid", StringType)
           )
         )
 
-        val df = spark.read
-          .schema(schema)
-          .option("delimiter", "\t")
-          .csv("dataset/studenttab10k")
+    val frame = spark.read
+      .schema(schema)
+      .option("delimiter", "\t")
+      .csv("file:\\D:\\迅雷下载\\裤子\\微博五亿2019.txt")
+    val df = frame
 
         // 3. 处理数据
-        val resultDF = df.where("age < 30")
+//        val resultDF = df.where("age < 30")
 
         // 4. 落地数据
-        resultDF.write
+    df.write
           .format("jdbc")
           .option("url", "jdbc:mysql://127.0.0.1:3306/pr")
-          .option("dbtable", "stu")
+          .option("dbtable", "a")
           .option("user", "root")
           .option("password", "123456")
           .option("driver","com.mysql.jdbc.Driver")

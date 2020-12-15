@@ -5,6 +5,7 @@ import org.junit.Test
 case class Person(name: String, age: Int)
 case class People(name: String, age: Int)
 case class Weibo(phone: Long, uid: Long)
+case class Emp(empno:Int,ename:String,job:String,mgr:Int,hiredate:String,sal:Int,comm:Int,deptno:Int)
 
 class Intro {
 
@@ -95,45 +96,80 @@ class Intro {
 
   @Test
   def dsIntro5(): Unit = {
-//    import org.apache.spark.sql.SparkSession
-    ////    import org.apache.spark.sql.DataFrame
-    ////
-    ////    val spark: SparkSession = new sql.SparkSession.Builder()
-    ////      .appName("hello")
-    ////      .master("local[6]")
-    ////      .getOrCreate()
-    ////
-    ////
-    //////    // 使用 load 方法
-    //////    val fromLoad: DataFrame = spark
-    //////      .read
-    //////      .format("csv")
-    //////      .option("header", true)
-    //////      .option("inferSchema", true)
-    //////      .load("dataset/BeijingPM20100101_20151231.csv")
-    ////
-    ////    // Using format-specific load operator
-    ////    val fromCSV: DataFrame = spark
-    ////      .read
-    ////      .option("header", true)
-    ////      .option("inferSchema", true)
-    ////      .csv("dataset/BeijingPM20100101_20151231.csv")
-    ////    val writer: DataFrameWriter[Row] = fromCSV.write
-    ////    writer.text("file:///D:/dataset/beijingPM")
-    ////
-    ////    // 使用 json 保存, 因为方法是 json, 所以隐含的 format 是 json
-    ////    //writer.json("file:///D:/dataset/beijingPM1.txt")
+    import org.apache.spark.sql.SparkSession
+        import org.apache.spark.sql.DataFrame
 
+        val spark: SparkSession = new sql.SparkSession.Builder()
+          .appName("hello")
+          .master("local[6]")
+          .getOrCreate()
+
+
+        // 使用 load 方法
+        val fromLoad: DataFrame = spark
+          .read
+          .format("csv")
+          .option("header", true)
+          .option("inferSchema", true)
+          .load("dataset/BeijingPM20100101_20151231.csv")
+
+        // Using format-specific load operator
+        val fromCSV: DataFrame = spark
+          .read
+          .option("header", true)
+          .option("inferSchema", true)
+          .csv("dataset/BeijingPM20100101_20151231.csv")
+        val writer: DataFrameWriter[Row] = fromCSV.write
+        writer.text("file:///D:/dataset/beijingPM")
+
+        // 使用 json 保存, 因为方法是 json, 所以隐含的 format 是 json
+        //writer.json("file:///D:/dataset/beijingPM1.txt")
+
+//    val spark: SparkSession = new sql.SparkSession.Builder()
+//      .appName("hello")
+//      .master("local[6]")
+//      .getOrCreate()
+//
+//    val dfFromParquet = spark.read.load("dataset/beijing_pm")
+//
+//    // 将 DataFrame 保存为 JSON 格式的文件
+//    dfFromParquet.repartition(1)
+//      .write.format("json")
+//      .save("dataset/beijing_pm_json")
+  }
+
+  @Test
+  def dsIntro6(): Unit = {
     val spark: SparkSession = new sql.SparkSession.Builder()
       .appName("hello")
       .master("local[6]")
       .getOrCreate()
 
-    val dfFromParquet = spark.read.load("dataset/beijing_pm")
+    val df = spark.read
+      .option("header", true)
+      .csv("dataset/BeijingPM20100101_20151231.csv")
 
-    // 将 DataFrame 保存为 JSON 格式的文件
-    dfFromParquet.repartition(1)
-      .write.format("json")
-      .save("dataset/beijing_pm_json")
+
+    df.show(10)
+    df.printSchema()
+
+
+    df.createOrReplaceTempView("temp_table")
+
+    spark.sql("select year, month, count(*) from temp_table where PM_Dongsi != 'NA' group by year, month")
+      .show()
+  }
+
+  @Test
+  def dsIntro7(): Unit = {
+//    val spark: SparkSession = new sql.SparkSession.Builder()
+//      .appName("hello")
+//      .master("local[6]")
+//      .getOrCreate()
+//    case class MyData(a:Int,b:String)
+//    import spark.implicits._
+//
+//    val ds = Seq(MyData(1, "Tom"), MyData(2, "Mary")).toDS
+//    ds.show
   }
 }
